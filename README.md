@@ -8,6 +8,10 @@ INSTALL
 
 You may need to configure Slim for clean URLs. See http://docs.slimframework.com/routing/rewrite/
 
+During development my URLs are of this form, https://example.com/share/www/item/a92b2ce2
+
+The `item.php` service lives at `/var/www/share/www/item.php`
+
 In the root of the application create a directory `items` that will contain all of the files you want to share.
 
 Inside of `items` you will create a directory for every file you want to share.
