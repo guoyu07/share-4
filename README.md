@@ -30,10 +30,10 @@ The format of `items/a92b2ce2/config.json` will be something similar to the foll
 
 `type` must be set to `count`. Future versions of Share will have other types.
 
-`total` is the total number of times a file may be downloaded.
+`total` is the total number of times a file may be downloaded. If `*` then the file can be download an unlimited number of times.
 
 `count` is the current number of downloads. Ideally set to 0 to start.
 
 `item` is the file name. e.g. For this file `items/a92b2ce2/My_File_To_Share.pdf` enter only `My_File_To_Share.pdf`.
 
-`mime` is the Mime type of the file being shared. Currently it will not be guessed.
+`mime` is the Mime type of the file being shared. Currently it will not be guessed. See https://en.wikipedia.org/wiki/Internet_media_type

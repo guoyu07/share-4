@@ -19,28 +19,47 @@ function responseByStatus($arr, $status, $app) {
 $app = new \Slim\Slim();
 
 $app->get('/item/:hash', function ($hash) use ($app) {
+    $send = false;
     $config = "../items/{$hash}/config.json";
     if (file_exists($config)) {
         $json = json_decode(file_get_contents($config), true);
         $item = "../items/{$hash}/{$json['item']}";
 
-        if ($json['type'] === "count" && $json['count'] < $json['total']) {
+        if ($json['type'] === "count" && ($json['count'] < $json['total'] || $json['total'] === "*")) {
             $update = $json;
             $update['count'] = $json['count'] + 1;
             file_put_contents($config, json_encode($update, JSON_PRETTY_PRINT));
-
-            $app->response()->header("Content-Type", $json['mime']);
-            $app->response->setStatus(200);
-            readfile($item);
+            $send = true;
         } else {
             $app->response()->header("Content-Type", "text/html");
             $app->response->setStatus(404);
-            print("<html><body>Item expired</body></html>");
+            die("<html><body>Item expired</body></html>");
+        }
+
+        if ($send) {
+            $mime = isset($json['mime']) ? $json['mime'] : "application/x-download";
+
+            $app->response()->header("Content-Description", $json['item']); 
+            $app->response()->header("Content-Type", $mime);
+            $app->response()->header("Content-Length", filesize($item)); 
+            // Will cause the file to download. In the case of an image the browser will not render the image.
+            //$app->response()->header("Content-Disposition", "attachment; filename = " . basename($json['item'])); 
+            //$app->response()->header("Content-Transfer-Encoding: binary"); 
+            $app->response()->header("Cache-Control", "must-revalidate, post-check = 0, pre-check = 0"); 
+            $app->response()->header("Expires", "0"); 
+            $app->response()->header("Pragma", "public"); 
+            $app->response->setStatus(200);
+
+            readfile($item);
+        } else {
+            $app->response()->header("Content-Type", "text/html");
+            $app->response->setStatus(403);
+            die("<html><body>Item access error</body></html>");
         }
     } else {
         $app->response()->header("Content-Type", "text/html");
         $app->response->setStatus(404);
-        print("<html><body>Item not found</body></html>");
+        die("<html><body>Item not found</body></html>");
     }
 });
 
