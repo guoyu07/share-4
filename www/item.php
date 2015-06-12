@@ -1,5 +1,6 @@
 <?php
 
+require_once("../config.php");
 require_once("../vendor/autoload.php");
 
 date_default_timezone_set("America/Indianapolis");
@@ -60,6 +61,16 @@ $app->get('/item/:hash', function ($hash) use ($app) {
         $app->response()->header("Content-Type", "text/html");
         $app->response->setStatus(404);
         die("<html><body>Item not found</body></html>");
+    }
+});
+
+$app->get('/item/validate/name/:name', function ($name) use ($app, $cfg) {
+    $app->response()->header("Content-Type", "application/json");
+    $app->response->setStatus(200);
+    if (file_exists("{$cfg['items-dir']}/{$name}")) {
+        die(json_encode(array("status" => "taken")));
+    } else {
+        die(json_encode(array("status" => "available")));
     }
 });
 

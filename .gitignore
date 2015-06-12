@@ -1,3 +1,4 @@
 items/
 composer.lock
 vendor/
+config.php
