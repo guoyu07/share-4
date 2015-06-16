@@ -26,25 +26,7 @@ $html .= <<<eof
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Share</title>
         <link rel="stylesheet" href="css/foundation.css" />
-        <style type="text/css">
-            body {
-                margin:16px;
-            }
-            .success {
-                display: block;
-                padding: 0.375rem 0.5625rem 0.5625rem;
-                margin-top: -1px;
-                margin-bottom: 1rem;
-                font-size: 0.75rem;
-                font-weight: normal;
-                font-style: italic;
-                background: #24c127;
-                color: #ffffff;
-            }
-            .alert-box p {
-                margin-bottom:0em;
-            }
-        </style>
+        <link rel="stylesheet" href="css/share.css" />
     </head>
     <body>
         <div class="row">
@@ -87,66 +69,14 @@ $html .= <<<eof
                     <input id="share-btn" class="button" type="submit" value="Share" onclick="return validate()" />
 
                 </form>
+
+                <p class="light-text">Powered by <a target="_blank" href="https://github.com/wsams/share.git">share</a></p>
             </div>
         </div>
         
         <script src="js/vendor/jquery.js"></script>
         <script src="js/foundation.min.js"></script>
-        <script>
-            var baseUrl = "{$cfg['base-item-url']}";
-
-            function validate() {
-                var total = $("#total").val();
-                if (undefined !== total && total != null) {
-                    total = total.replace(/\s*/, "");
-                }
-                var totalInt = parseInt(total, 10);
-                if (!isNaN(totalInt)) {
-                    return true;
-                } else if (total === "*") {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            function validateName() {
-                var name = $("#name").val();
-                $.getJSON("item/validate/name/" + encodeURIComponent(name), function(json) {
-                    if (json.status === "available") {
-                        $("#name-message").html("Name is available").removeClass("error").addClass("success");
-                        $("#share-btn").attr("disabled", false);
-                        var itemUrl = baseUrl + "/" + encodeURIComponent(name);
-                        $("#item-url").html(itemUrl).attr("href", itemUrl);
-                        $("#itemUrl").val(itemUrl);
-                    } else if (json.status === "taken") {
-                        $("#name-message").html("Name is taken").addClass("error").removeClass("success");
-                        $("#share-btn").attr("disabled", "disabled");
-                    }
-                });
-            }
-
-            $(document).foundation();
-
-            $(document).ready(function () {
-                $("#share-btn").attr("disabled", "disabled");
-
-                validateName();
-
-                $("#name").on("keyup", function () {
-                    validateName();
-                });
-
-                $("#item").on("change", function () {
-                    $("#mime").val("");
-                    $.getJSON("item/validate/mime/" + encodeURIComponent($("#item").val()), function(json) {
-                        if (json.status === "exists") {
-                            $("#mime").val(json.mime);
-                        }
-                    });
-                });
-            });
-        </script>
+        <script src="js/share.js"></script>
     </body>
 </html>
 eof;
