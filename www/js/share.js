@@ -1,5 +1,3 @@
-var baseUrl = "{$cfg['base-item-url']}";
-
 function validate() {
     var total = $("#total").val();
     if (undefined !== total && total != null) {
@@ -15,7 +13,7 @@ function validate() {
     }
 }
 
-function validateName() {
+function validateName(baseUrl) {
     var name = $("#name").val();
     $.getJSON("item/validate/name/" + encodeURIComponent(name), function(json) {
         if (json.status === "available") {
@@ -36,10 +34,10 @@ $(document).foundation();
 $(document).ready(function () {
     $("#share-btn").attr("disabled", "disabled");
 
-    validateName();
+    validateName(baseUrl);
 
     $("#name").on("keyup", function () {
-        validateName();
+        validateName(baseUrl);
     });
 
     $("#item").on("change", function () {
