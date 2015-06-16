@@ -1,6 +1,20 @@
 <?php
 
 require_once("../config.php");
+require_once("../lib/mimes.php");
+
+$hash = substr(sha1(microtime()), 0, 8);
+$config = "../items/{$hash}/config.json";
+while (file_exists($config)) {
+    $hash = substr(sha1(microtime()), 0, 8);
+    $config = "../items/{$hash}/config.json";
+}
+
+$message = "";
+if ($_GET['a'] === "s") {
+    $message = "<p>File uploaded and ready for sharing.</p>";
+    $message .= "<p><a href=\"{$_GET['u']}\">{$_GET['u']}</a></p>";
+}
 
 $html .= <<<eof
 <!doctype html>
@@ -10,7 +24,6 @@ $html .= <<<eof
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Share</title>
         <link rel="stylesheet" href="css/foundation.css" />
-        <script src="js/vendor/modernizr.js"></script>
         <style type="text/css">
             .success {
                 display: block;
@@ -28,45 +41,91 @@ $html .= <<<eof
     <body>
         <div class="row">
             <div class="large-12 columns">
-<!-- {
-"type": "count",
-"total": 2,
-"count": 2,
-"item": "InkSignedDocuments.pdf",
-"mime": "application\/pdf"
-} 
--->
-                <label>Total number of downloads
-                    <input type="text" placeholder="Enter an integer..." id="total" />
-                </label>
+                <div>{$message}</div>
+                <form method="post" action="item/upload" enctype="multipart/form-data">
+                    <label>Total number of downloads (integer), or enter asterisk (*) for unlimited.
+                        <input type="text" placeholder="Enter an integer..." id="total" name="total" value="1" />
+                    </label>
 
-                <label>An item name - this will be used in the URL. For example, if the name
-                        is <code>abcd</code> then the URL would be <code>{$cfg['base-item-url']}/abcd</code>. This
-                        may be an obfuscated hash or the exact file name depending on usage.
-                    <input type="text" placeholder="Enter an item name..." id="name" />
-                    <small id="name-message"></small>
-                </label>
+                    <label>An item name - this will be used in the URL. For example, if the name
+                            is <code>abcd</code> then the URL would be <code>{$cfg['base-item-url']}/abcd</code>. This
+                            may be an obfuscated hash or the exact file name depending on usage.
+                        <input type="text" placeholder="Enter an item name..." id="name" name="name" value="{$hash}" />
+                        <small id="name-message"></small>
+                    </label>
 
-                <label>A mime type. This application does not attempt to guess the mime type of the file
-                        you upload. If you don't know the mime type you will find a large list here: 
-                        <a target="_blank" href="https://en.wikipedia.org/wiki/Internet_media_type">wiki:Internet media type</a>
-                    <input type="text" placeholder="Enter a mime type..." id="mime" />
-                </label>
+                    <div class="upload-wrapper">
+                        <label>File to share.
+                            <input type="file" placeholder="Upload a file..." id="item" name="item" />
+                        </label>
+                    </div>
+
+                    <label>A mime type will be guessed, otherwise you may find it here:
+                            <a target="_blank" href="https://en.wikipedia.org/wiki/Internet_media_type">wiki:Internet media type</a>
+                        <input type="text" placeholder="Enter a mime type..." id="mime" name="mime" />
+                    </label>
+
+                    <label>Item URL, take note before clicking Share: <a id="item-url" href="#"></a></label>
+
+                    <input type="hidden" name="itemUrl" id="itemUrl" value="" />
+                    <input id="share-btn" class="button" type="submit" value="Share" onclick="return validate()" />
+
+                </form>
             </div>
         </div>
         
         <script src="js/vendor/jquery.js"></script>
         <script src="js/foundation.min.js"></script>
         <script>
+            var baseUrl = "{$cfg['base-item-url']}";
+
+            function validate() {
+                var total = $("#total").val();
+                if (undefined !== total && total != null) {
+                    total = total.replace(/\s*/, "");
+                }
+                var totalInt = parseInt(total, 10);
+                if (!isNaN(totalInt)) {
+                    return true;
+                } else if (total === "*") {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function validateName() {
+                var name = $("#name").val();
+                $.getJSON("item/validate/name/" + encodeURIComponent(name), function(json) {
+                    if (json.status === "available") {
+                        $("#name-message").html("Name is available").removeClass("error").addClass("success");
+                        $("#share-btn").attr("disabled", false);
+                        var itemUrl = baseUrl + "/" + encodeURIComponent(name);
+                        $("#item-url").html(itemUrl).attr("href", itemUrl);
+                        $("#itemUrl").val(itemUrl);
+                    } else if (json.status === "taken") {
+                        $("#name-message").html("Name is taken").addClass("error").removeClass("success");
+                        $("#share-btn").attr("disabled", "disabled");
+                    }
+                });
+            }
+
             $(document).foundation();
+
             $(document).ready(function () {
+                $("#share-btn").attr("disabled", "disabled");
+
+                validateName();
+
                 $("#name").on("keyup", function () {
-                    var name = $("#name").val();
-                    $.getJSON("item/validate/name/" + encodeURIComponent(name), function(json) {
-                        if (json.status === "available") {
-                            $("#name-message").html("Name is available").removeClass("error").addClass("success");
-                        } else if (json.status === "taken") {
-                            $("#name-message").html("Name is taken").addClass("error").removeClass("success");
+                    validateName();
+                });
+
+                $("#item").on("change", function () {
+                    $("#mime").val("");
+                    $.getJSON("item/validate/mime/" + encodeURIComponent($("#item").val()), function(json) {
+                        if (json.status === "exists") {
+                            $("#mime").val(json.mime);
                         }
                     });
                 });

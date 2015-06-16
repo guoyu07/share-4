@@ -2,6 +2,7 @@
 
 require_once("../config.php");
 require_once("../vendor/autoload.php");
+require_once("../lib/mimes.php");
 
 date_default_timezone_set("America/Indianapolis");
 
@@ -72,6 +73,46 @@ $app->get('/item/validate/name/:name', function ($name) use ($app, $cfg) {
     } else {
         die(json_encode(array("status" => "available")));
     }
+});
+
+$app->get('/item/validate/mime/:filename', function ($filename) use ($app, $cfg, $mimes) {
+    $app->response()->header("Content-Type", "application/json");
+    $app->response->setStatus(200);
+    $ext = preg_replace("/^.*\.(.*)$/", "\${1}", $filename);
+    if (array_key_exists($ext, $mimes)) {
+        $mime = $mimes[$ext];
+        die(json_encode(array("status" => "exists", "mime" => $mime)));
+    } else {
+        die(json_encode(array("status" => "exists", "mime" => "application/octet-stream", 
+            "message" => "mime could not be determined")));
+    }
+});
+
+
+$app->post('/item/upload', function () use ($app, $cfg) {
+    if($app->request()->isPost()) {
+        $name = $_FILES['item']['name'];
+        $tmp_name = $_FILES['item']['tmp_name'];
+        $total = $_POST['total'];
+        $hash = $_POST['name'];
+        $mime = $_POST['mime'];
+
+        $configDir = "../items/{$hash}";
+        $config = "{$configDir}/config.json";
+        $file = "{$configDir}/{$name}";
+        $configJson = array("type" => "count", "total" => $total, "count" => 0,
+                "item" => $name, "mime" => $mime);
+        $json = json_encode($configJson);
+
+        if (!file_exists($configDir)) {
+            mkdir($configDir);
+        }
+
+        file_put_contents($config, $json);
+        move_uploaded_file($tmp_name, $file);
+    }
+
+    $app->redirect("../share.php?a=s&u=" . urlencode($_POST['itemUrl']));
 });
 
 $app->run();
