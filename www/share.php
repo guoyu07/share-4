@@ -12,8 +12,10 @@ while (file_exists($config)) {
 
 $message = "";
 if ($_GET['a'] === "s") {
-    $message = "<p>File uploaded and ready for sharing.</p>";
+    $message = "<div class=\"alert-box radius secondary\">";
+    $message .= "<p>File uploaded and ready for sharing.</p>";
     $message .= "<p><a href=\"{$_GET['u']}\">{$_GET['u']}</a></p>";
+    $message .= "</div>";
 }
 
 $html .= <<<eof
@@ -25,6 +27,9 @@ $html .= <<<eof
         <title>Share</title>
         <link rel="stylesheet" href="css/foundation.css" />
         <style type="text/css">
+            body {
+                margin:16px;
+            }
             .success {
                 display: block;
                 padding: 0.375rem 0.5625rem 0.5625rem;
@@ -36,36 +41,47 @@ $html .= <<<eof
                 background: #24c127;
                 color: #ffffff;
             }
+            .alert-box p {
+                margin-bottom:0em;
+            }
         </style>
     </head>
     <body>
         <div class="row">
             <div class="large-12 columns">
-                <div>{$message}</div>
+                {$message}
                 <form method="post" action="item/upload" enctype="multipart/form-data">
-                    <label>Total number of downloads (integer), or enter asterisk (*) for unlimited.
-                        <input type="text" placeholder="Enter an integer..." id="total" name="total" value="1" />
-                    </label>
-
-                    <label>An item name - this will be used in the URL. For example, if the name
-                            is <code>abcd</code> then the URL would be <code>{$cfg['base-item-url']}/abcd</code>. This
-                            may be an obfuscated hash or the exact file name depending on usage.
-                        <input type="text" placeholder="Enter an item name..." id="name" name="name" value="{$hash}" />
-                        <small id="name-message"></small>
-                    </label>
-
-                    <div class="upload-wrapper">
+                    <div class="panel">
                         <label>File to share.
                             <input type="file" placeholder="Upload a file..." id="item" name="item" />
                         </label>
                     </div>
 
-                    <label>A mime type will be guessed, otherwise you may find it here:
-                            <a target="_blank" href="https://en.wikipedia.org/wiki/Internet_media_type">wiki:Internet media type</a>
-                        <input type="text" placeholder="Enter a mime type..." id="mime" name="mime" />
-                    </label>
+                    <div class="panel">
+                        <label>Total number of downloads (integer), or enter asterisk (*) for unlimited.
+                            <input type="text" placeholder="Enter an integer..." id="total" name="total" value="1" />
+                        </label>
+                    </div>
 
-                    <label>Item URL, take note before clicking Share: <a id="item-url" href="#"></a></label>
+                    <div class="panel">
+                        <label>An item name - this will be used in the URL. For example, if the name
+                                is <code>abcd</code> then the URL would be <code>{$cfg['base-item-url']}/abcd</code>. This
+                                may be an obfuscated hash or the exact file name depending on usage.
+                            <input type="text" placeholder="Enter an item name..." id="name" name="name" value="{$hash}" />
+                            <small id="name-message"></small>
+                        </label>
+                    </div>
+
+                    <div class="panel">
+                        <label>A mime type will be guessed, otherwise you may find it here:
+                                <a target="_blank" href="https://en.wikipedia.org/wiki/Internet_media_type">wiki:Internet media type</a>
+                            <input type="text" placeholder="Enter a mime type..." id="mime" name="mime" />
+                        </label>
+                    </div>
+
+                    <div class="panel">
+                        <label>Item URL, take note before clicking Share: <a id="item-url" href="#"></a></label>
+                    </div>
 
                     <input type="hidden" name="itemUrl" id="itemUrl" value="" />
                     <input id="share-btn" class="button" type="submit" value="Share" onclick="return validate()" />
