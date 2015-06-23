@@ -2,3 +2,4 @@ items/
 composer.lock
 vendor/
 config.php
+vi.project

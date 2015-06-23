@@ -53,6 +53,12 @@ $app->get('/item/:hash', function ($hash) use ($app) {
             $app->response->setStatus(200);
 
             readfile($item);
+
+            if ($update['total'] !== "*" 
+                    && intval($update['count']) == intval($update['total']) 
+                    && $update['destruct']) {
+                unlink($item);
+            }
         } else {
             $app->response()->header("Content-Type", "text/html");
             $app->response->setStatus(403);
@@ -93,7 +99,8 @@ $app->post('/item/upload', function () use ($app, $cfg) {
     if($app->request()->isPost()) {
         $name = $_FILES['item']['name'];
         $tmp_name = $_FILES['item']['tmp_name'];
-        $total = $_POST['total'];
+        $total = $_POST['total'] === "*" ? "*" : intval($_POST['total']);
+        $destruct = isset($_POST['destruct']) && $_POST['destruct'] === "destruct" ? true : false;
         $hash = $_POST['name'];
         $mime = $_POST['mime'];
 
@@ -101,7 +108,7 @@ $app->post('/item/upload', function () use ($app, $cfg) {
         $config = "{$configDir}/config.json";
         $file = "{$configDir}/{$name}";
         $configJson = array("type" => "count", "total" => $total, "count" => 0,
-                "item" => $name, "mime" => $mime);
+                "item" => $name, "mime" => $mime, "destruct" => $destruct);
         $json = json_encode($configJson);
 
         if (!file_exists($configDir)) {

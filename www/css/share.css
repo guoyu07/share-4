@@ -1,17 +1,19 @@
 body {
     margin:16px;
 }
+
 .success {
     display: block;
-    padding: 0.375rem 0.5625rem 0.5625rem;
+    padding: 0.375em 0.5625em 0.5625em;
     margin-top: -1px;
-    margin-bottom: 1rem;
-    font-size: 0.75rem;
+    margin-bottom: 1em;
+    font-size: 0.75em;
     font-weight: normal;
     font-style: italic;
     background: #24c127;
     color: #ffffff;
 }
+
 .alert-box p {
     margin-bottom:0em;
 }
@@ -19,4 +21,8 @@ body {
 .light-text {
     color:gray;
     font-size:0.75em;
+}
+
+label {
+    font-size:1.2em;
 }

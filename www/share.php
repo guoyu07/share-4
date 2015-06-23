@@ -34,21 +34,23 @@ $html .= <<<eof
                 {$message}
                 <form method="post" action="item/upload" enctype="multipart/form-data">
                     <div class="panel">
-                        <label>File to share.
+                        <label>File to share
                             <input type="file" placeholder="Upload a file..." id="item" name="item" />
                         </label>
                     </div>
 
                     <div class="panel">
-                        <label>Total number of downloads (integer), or enter asterisk (*) for unlimited.
+                        <label>Total number of downloads (integer), or enter asterisk (*) for unlimited
                             <input type="text" placeholder="Enter an integer..." id="total" name="total" value="1" />
+                        </label>
+
+                        <label>Self destruct after downloads depleted
+                            <input type="checkbox" id="destruct" name="destruct" value="destruct" />
                         </label>
                     </div>
 
                     <div class="panel">
-                        <label>An item name - this will be used in the URL. For example, if the name
-                                is <code>abcd</code> then the URL would be <code>{$cfg['base-item-url']}/abcd</code>. This
-                                may be an obfuscated hash or the exact file name depending on usage.
+                        <label>URL identifier, e.g. <code>{$cfg['base-item-url']}/{$hash}</code>
                             <input type="text" placeholder="Enter an item name..." id="name" name="name" value="{$hash}" />
                             <small id="name-message"></small>
                         </label>
