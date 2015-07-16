@@ -50,7 +50,7 @@ $html .= <<<eof
                     </div>
 
                     <div class="panel">
-                        <label>URL identifier, e.g. <code>{$cfg['base-item-url']}/{$hash}</code>
+                        <label>URL identifier, e.g. <code class="item-url">{$cfg['base-item-url']}/{$hash}</code>
                             <input type="text" placeholder="Enter an item name..." id="name" name="name" value="{$hash}" />
                             <small id="name-message"></small>
                         </label>

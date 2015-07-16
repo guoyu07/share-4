@@ -21,6 +21,7 @@ function validateName(baseUrl) {
             $("#share-btn").attr("disabled", false);
             var itemUrl = baseUrl + "/" + encodeURIComponent(name);
             $("#item-url").html(itemUrl).attr("href", itemUrl);
+            $(".item-url").html(itemUrl);
             $("#itemUrl").val(itemUrl);
         } else if (json.status === "taken") {
             $("#name-message").html("Name is taken").addClass("error").removeClass("success");
