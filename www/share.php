@@ -23,6 +23,7 @@ $html .= <<<eof
 <html class="no-js" lang="en">
     <head>
         <meta charset="utf-8" />
+        <link rel="shortcut icon" href="favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Share</title>
         <link rel="stylesheet" href="css/foundation.css" />
